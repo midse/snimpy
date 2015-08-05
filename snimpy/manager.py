@@ -28,6 +28,7 @@ Here is a simple example of use of this module::
     <String: lo>
 """
 
+import redis
 import inspect
 from time import time
 from collections import MutableMapping
@@ -478,14 +479,24 @@ class ProxyColumn(Proxy, MutableMapping):
 
 loaded = []
 
-
-def load(mibname):
+def load(mibname, cache=False):
     """Load a MIB in memory.
 
     :param mibname: MIB name or filename
     :type mibname: str
     """
-    m = mib.load(mibname)
+    if not cache:
+        m = mib.load(mibname)
+    else:
+        r = redis.StrictRedis()
+        m = r.hget('MIB_CACHE', mibname)
+
+        if not m:
+            m = mib.load(mibname)
+            r.hset('MIB_CACHE', mibname, m)
+
+    #m = mib.load(mibname)
+
     if m not in loaded:
         loaded.append(m)
         if Manager._complete:
