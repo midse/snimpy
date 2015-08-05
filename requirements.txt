@@ -16,4 +16,5 @@ pycparser==2.14
 pycrypto==2.6.1
 pyflakes==0.8.1
 pysnmp==4.2.5
+wsgiref==0.1.2
 redis==2.10.3
